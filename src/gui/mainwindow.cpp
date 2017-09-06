@@ -184,6 +184,7 @@ void MainWindow::showIfDelayed()
 		}
 	}
 	m_delayedShow = DelayedShow::Disabled;
+  setWindowState(Qt::WindowMaximized);
 }
 
 void MainWindow::neovimAttachmentChanged(bool attached)
