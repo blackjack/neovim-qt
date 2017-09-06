@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(neovim-qt)
 
+set(CPACK_DEBIAN_PACKAGE_MAINTAINER me)
+set(CPACK_PACKAGE_VERSION 9.9.9)
 INCLUDE(CPack)
 
 if(NOT EXISTS ${NEOVIM_EXEC})

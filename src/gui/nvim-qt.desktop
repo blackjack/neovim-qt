@@ -6,4 +6,5 @@ Exec=nvim-qt -- %F
 Icon=nvim-qt
 Type=Application
 Terminal=false
+StartupWMClass=nvim-qt
 Categories=Utility;TextEditor;

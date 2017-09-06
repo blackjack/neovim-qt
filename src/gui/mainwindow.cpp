@@ -125,7 +125,6 @@ void MainWindow::neovimFullScreen(bool set)
 
 void MainWindow::neovimGuiCloseRequest()
 {
-	QMainWindow::close();
 }
 
 void MainWindow::reconnectNeovim()
@@ -139,11 +138,11 @@ void MainWindow::reconnectNeovim()
 void MainWindow::closeEvent(QCloseEvent *ev)
 {
 	// Never unless the Neovim shell closes too
-	if (m_shell->close()) {
-		QWidget::closeEvent(ev);
-	} else {
-		ev->ignore();
-	}
+  if (m_shell->close()) {
+    QWidget::closeEvent(ev);
+  } else {
+    ev->ignore();
+  }
 }
 void MainWindow::changeEvent( QEvent *ev)
 {
