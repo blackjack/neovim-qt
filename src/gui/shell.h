@@ -28,7 +28,7 @@ public:
 class ShellOptions {
 public:
 	ShellOptions() {
-		enable_ext_tabline = true;
+		enable_ext_tabline = false;
 	}
 	bool enable_ext_tabline;
 };
