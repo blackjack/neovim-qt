@@ -32,9 +32,9 @@ void ShellWidget::setDefaultFont()
 #elif defined(Q_OS_WIN)
 #  define DEFAULT_FONT "Consolas"
 #else
-#  define DEFAULT_FONT "Ubuntu Mono"
+#  define DEFAULT_FONT "Monospace"
 #endif
-	setShellFont(DEFAULT_FONT, 12.5, -1, false, true);
+	setShellFont(DEFAULT_FONT, 11, -1, false, true);
 }
 
 bool ShellWidget::setShellFont(const QString& family, int ptSize, int weight, bool italic, bool force)
