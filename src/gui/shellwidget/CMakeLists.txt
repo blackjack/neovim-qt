@@ -1,4 +1,7 @@
 cmake_minimum_required(VERSION 2.8.11)
+if (POLICY CMP0048)
+  cmake_policy(SET CMP0048 NEW)
+endif (POLICY CMP0048)
 project(qshellwidget)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -7,6 +10,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 find_package(Qt5Widgets REQUIRED)
 find_package(Qt5Test REQUIRED)
+
+if (WIN32 AND USE_STATIC_QT)
+	add_definitions(-DUSE_STATIC_QT)
+endif ()
 
 set(SOURCES shellcontents.cpp helpers.cpp shellwidget.cpp konsole_wcwidth.cpp)
 add_library(qshellwidget STATIC ${SOURCES})

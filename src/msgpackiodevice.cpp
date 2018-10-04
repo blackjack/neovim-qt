@@ -48,7 +48,6 @@ MsgpackIODevice::MsgpackIODevice(QIODevice *dev, QObject *parent)
 :QObject(parent), m_reqid(0), m_dev(dev), m_encoding(0), m_reqHandler(0), m_error(NoError)
 {
 	qRegisterMetaType<MsgpackError>("MsgpackError");
-	qRegisterMetaType<Function::FunctionId>("Function::FunctionId");
 	msgpack_unpacker_init(&m_uk, MSGPACK_UNPACKER_INIT_BUFFER_SIZE);
 
 	if (m_dev) {
@@ -269,7 +268,7 @@ void MsgpackIODevice::dispatch(msgpack_object& req)
 		}
 		if (req.via.array.ptr[3].type != MSGPACK_OBJECT_ARRAY) {
 			qDebug() << "Invalid request: arguments MUST be an array";
-			sendError(req, tr("Paremeters must be an array"));
+			sendError(req, tr("Parameters must be an array"));
 			return;
 		}
 		dispatchRequest(req);
@@ -338,6 +337,7 @@ void MsgpackIODevice::setRequestHandler(MsgpackRequestHandler *h)
 bool MsgpackIODevice::sendResponse(uint64_t msgid, const QVariant& err, const QVariant& res)
 {
 	if (!checkVariant(err) || !checkVariant(res)) {
+		qDebug() << "Unable to serialize response" << res;
 		sendError(msgid, tr("Internal server error, could not serialize response"));
 		return false;
 	}
@@ -757,6 +757,12 @@ void MsgpackIODevice::send(const QVariant& var)
 	case QMetaType::QByteArray:
 		send(var.toByteArray());
 		break;
+	case QMetaType::QStringList:
+		msgpack_pack_array(&m_pk, var.toList().size());
+		foreach(const QVariant& elem, var.toList()) {
+			send(elem);
+		}
+		break;
 	case QMetaType::QVariantList:
 		msgpack_pack_array(&m_pk, var.toList().size());
 		foreach(const QVariant& elem, var.toList()) {
@@ -875,6 +881,8 @@ bool MsgpackIODevice::checkVariant(const QVariant& var)
 	case QMetaType::Double:
 		break;
 	case QMetaType::QByteArray:
+		break;
+	case QMetaType::QStringList:
 		break;
 	case QMetaType::QVariantList:
 		foreach(const QVariant& elem, var.toList()) {

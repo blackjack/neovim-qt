@@ -38,7 +38,9 @@ For MSVC build you may have to specify the VS version and build type. Always mak
 	$ cmake -G "Visual Studio 14" -DCMAKE_BUILD_TYPE=Release ..
 	$ cmake --build . --config Release --target install
 
-The binaries will be under build/bin/. The GUI binary is called nvim-qt.
+The binaries will be under build/bin/. The GUI binary is called nvim-qt. Run make install to install it, or execute from the source setting the environment variable NVIM_QT_RUNTIME as the path holding the GUI shim plugin
+
+	$ NVIM_QT_RUNTIME_PATH=../src/gui/runtime bin/nvim-qt
 
 ## Using the GUI
 
@@ -47,6 +49,10 @@ Run **nvim-qt**, the **nvim** binary must be in your $PATH. Check `nvim-qt --hel
 Commands for interacting with the GUI are regular commands, available in the documentation [:help nvim-gui-shim](./src/gui/runtime/doc/nvim_gui_shim.txt). For example to change the font call
 
 	:Guifont DejaVu Sans Mono:h13
+
+To disable the GUI tabline and use the nvim TUI tabline, call
+
+	:GuiTabline 0
 
 You can set GUI options on startup, in the GUI configuration file (:help ginit.vim).
 

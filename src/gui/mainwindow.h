@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStackedWidget>
+#include <QTabBar>
 #include "neovimconnector.h"
 #include "errorwidget.h"
 #include "shell.h"
@@ -20,7 +21,7 @@ public:
 		FullScreen,
 	};
 
-	MainWindow(NeovimConnector *, QWidget *parent=0);
+	MainWindow(NeovimConnector *, ShellOptions opts, QWidget *parent=0);
 	bool neovimAttached() const;
 	Shell* shell();
 public slots:
@@ -34,6 +35,7 @@ private slots:
 	void neovimSetTitle(const QString &title);
 	void neovimWidgetResized();
 	void neovimMaximized(bool);
+	void neovimSuspend();
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
 	void neovimExited(int status);
@@ -41,6 +43,11 @@ private slots:
 	void reconnectNeovim();
 	void showIfDelayed();
 	void neovimAttachmentChanged(bool);
+	void neovimIsUnsupported();
+	void neovimShowtablineSet(int);
+	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
+	void extTablineSet(bool);
+	void changeTab(int index);
 private:
 	void init(NeovimConnector *);
         NeovimConnector *m_nvim;
@@ -48,6 +55,10 @@ private:
 	Shell *m_shell;
 	DelayedShow m_delayedShow;
 	QStackedWidget m_stack;
+	QTabBar *m_tabline;
+	QToolBar *m_tabline_bar;
+	ShellOptions m_shell_options;
+	bool m_neovim_requested_close;
 };
 
 } // Namespace

@@ -71,6 +71,16 @@ function s:GuiLinespaceCommand(height) abort
 endfunction
 command! -nargs=? GuiLinespace call s:GuiLinespaceCommand("<args>")
 
+function! s:GuiTabline(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'Tabline', a:enable)
+endfunction
+command! -nargs=1 GuiTabline call s:GuiTabline(<args>)
+
+function! s:GuiPopupmenu(enable) abort
+	call rpcnotify(0, 'Gui', 'Option', 'Popupmenu', a:enable)
+endfunction
+command! -nargs=1 GuiPopupmenu call s:GuiPopupmenu(<args>)
+
 " GuiDrop('file1', 'file2', ...) is similar to :drop file1 file2 ...
 " but it calls fnameescape() over all arguments
 function GuiDrop(...)
@@ -80,4 +90,21 @@ function GuiDrop(...)
 	if !has('nvim-0.2')
 		doautocmd BufEnter
 	endif
+endfunction
+
+function GuiName()
+	if !has('nvim-0.3')
+		return ''
+	endif
+
+	let uis = nvim_list_uis()
+	if len(uis) == 0
+		echoerr "No UIs are attached"
+		return
+	endif
+
+	" Use the last UI in the list
+	let ui_chan = uis[-1].chan
+	let info = nvim_get_chan_info(ui_chan)
+	return get(info.client, 'name', '')
 endfunction

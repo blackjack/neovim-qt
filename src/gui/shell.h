@@ -9,10 +9,36 @@
 #include <QTimer>
 #include <QUrl>
 #include <QList>
+#include <QMenu>
 #include "neovimconnector.h"
 #include "shellwidget/shellwidget.h"
+#include "popupmenu.h"
+#include "popupmenumodel.h"
 
 namespace NeovimQt {
+
+class Tab {
+public:
+	Tab(int64_t id, QString name) {
+		this->tab = id;
+		this->name = name;
+	}
+	/// The tab handle, a unique tab identifier
+	int64_t tab;
+	QString name;
+};
+
+class ShellOptions {
+public:
+	ShellOptions() {
+		enable_ext_tabline = true;
+		enable_ext_popupmenu = true;
+		nvim_show_tabline = 1;
+	}
+	bool enable_ext_tabline;
+	int nvim_show_tabline;
+	bool enable_ext_popupmenu;
+};
 
 class Shell: public ShellWidget
 {
@@ -20,7 +46,7 @@ class Shell: public ShellWidget
 	Q_PROPERTY(bool neovimBusy READ neovimBusy() NOTIFY neovimBusy())
 	Q_PROPERTY(bool neovimAttached READ neovimAttached() NOTIFY neovimAttached())
 public:
-	Shell(NeovimConnector *nvim, QWidget *parent=0);
+	Shell(NeovimConnector *nvim, ShellOptions opts, QWidget *parent=0);
 	~Shell();
 	QSize sizeIncrement() const;
 	static QColor color(qint64 color, const QColor& fallback=QColor());
@@ -36,8 +62,17 @@ signals:
 	void neovimResized(int rows, int cols);
 	void neovimAttached(bool);
 	void neovimMaximized(bool);
+	void neovimSuspend();
 	void neovimFullScreen(bool);
 	void neovimGuiCloseRequest();
+	/// This signal is emmited if the running neovim version is unsupported by the GUI
+	void neovimIsUnsupported();
+	void neovimExtTablineSet(bool);
+	void neovimExtPopupmenuSet(bool);
+	/// The tabline needs updating. curtab is the handle of the current tab (not its index)
+	/// as seen in Tab::tab.
+	void neovimTablineUpdate(int64_t curtab, QList<Tab> tabs);
+	void neovimShowtablineSet(int);
 
 public slots:
 	void handleNeovimNotification(const QByteArray &name, const QVariantList& args);
@@ -53,9 +88,10 @@ protected slots:
 	void neovimResizeFinished();
 	void mouseClickReset();
 	void mouseClickIncrement(Qt::MouseButton bt);
-        void init();
+	void init();
 	void fontError(const QString& msg);
 	void updateWindowId();
+	void updateClientInfo();
 
 protected:
 	void tooltip(const QString& text);
@@ -88,11 +124,18 @@ protected:
 	virtual void handleSetTitle(const QVariantList& opargs);
 	virtual void handleSetScrollRegion(const QVariantList& opargs);
 	virtual void handleBusy(bool);
+	virtual void handleSetOption(const QString& name, const QVariant& value);
+	void handleExtGuiOption(const QString& name, const QVariant& value);
+	virtual void handlePopupMenuShow(const QVariantList& items, int64_t selected,
+			int64_t row, int64_t col);
+	void handlePopupMenuSelect(int64_t selected);
+	virtual void handleMouse(bool);
 
 	void neovimMouseEvent(QMouseEvent *ev);
 	virtual void mousePressEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseReleaseEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
 	virtual void mouseMoveEvent(QMouseEvent *ev) Q_DECL_OVERRIDE;
+	void bailoutIfinputBlocking();
 
 private slots:
         void setAttached(bool attached=true);
@@ -130,6 +173,9 @@ private:
 
 	// Properties
 	bool m_neovimBusy;
+	ShellOptions m_options;
+	PopupMenu m_pum;
+	bool m_mouseEnabled;
 };
 
 } // Namespace

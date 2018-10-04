@@ -45,6 +45,12 @@ GuiLinespace	When called with no arguments this command displays the
 		linespace, the number of extra pixels each line will have.
                 A single argument is accepted as the new linespace height.
 
+								*GuiTabline*
+GuiTabline	Enable or disable the external GUI tabline
+
+								*GuiPopupmenu*
+GuiPopupmenu	Enable or disable the external GUI popup menu
+
 
 ==============================================================================
 2. GUI variables
@@ -74,6 +80,8 @@ override the window behaviour.
 
 							*g:GuiWindowId*
 g:GuiWindowId holds the window id (X11) or the window handle (Windows).
+This was an alternative to v:windowid, but since nvim 0.1.4, v:windowid can
+also be used by external UIs to hold this information.
 
 							*g:GuiFont*
 g:GuiFont holds the current GUI font name, the same value used by
@@ -125,6 +133,17 @@ user moves the mouse, the cursor becomes visible. Replaces |'mousehide'|.
 GuiClose() notifies the GUI that it should close. The GUI may or may not
 respect this request. The shim setups an autocommand to call this function
 when the |'VimLeave'| event occurs.
+
+							*GuiName()*
+Returns the name of the GUI client. If multiple GUIs are connected the last
+one is used. If no name is available an empty string is returned.
+This can be used to check for a specific GUI in ginit.vim, e.g.
+>
+	if GuiName() == 'nvim-qt'
+	  " ...
+	endif
+
+This is a wrapper around |nvim_get_chan_info()|.
 
 ==============================================================================
 4. Internals
